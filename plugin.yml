@@ -1,0 +1,26 @@
+name: CharacterCards
+author: Lucariatias
+version: 1.2.7
+main: com.gildorym.charactercards.CharacterCards
+commands:
+    setage:
+        description: Sets your age
+        usage: /<command> [age]
+    setgender:
+        description: Sets your gender
+        usage: /<command> [gender]
+    setrace:
+        description: Sets your race
+        usage: /<command> [race]
+    setinfo:
+        description: Sets your description
+        usage: /<command> [information]
+    addinfo:
+        description: Adds to your description
+        usage: /<command> [information]
+    char:
+        description: Shows your own character card
+        usage: /<command>
+    takehit:
+        description: Takes a hit
+        usage: /<command>
