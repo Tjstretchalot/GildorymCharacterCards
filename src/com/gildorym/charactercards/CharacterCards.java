@@ -37,17 +37,19 @@ public class CharacterCards extends JavaPlugin {
 					BasicChar basicChar = (BasicChar) Bukkit.getServer().getPluginManager().getPlugin("BasicChar");
 					if (basicChar.levels.get(player.getName()) != null) {
 						Integer maxHealth = (int) (5 + Math.floor(basicChar.levels.get(player.getName()) / 5));
-						if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.ELF) {
-							maxHealth -= 1;
-						}
-						if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.DWARF) {
-							maxHealth += 1;
-						}
-						if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.GNOME) {
-							maxHealth += 1;
-						}
-						if (CharacterCards.this.getCharacterCards().get(player.getName()).getHealth() < maxHealth) {
-							CharacterCards.this.getCharacterCards().get(player.getName()).setHealth(CharacterCards.this.getCharacterCards().get(player.getName()).getHealth() + 1);
+						if (CharacterCards.this.getCharacterCards().get(player.getName()) != null) {
+							if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.ELF) {
+								maxHealth -= 1;
+							}
+							if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.DWARF) {
+								maxHealth += 1;
+							}
+							if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.GNOME) {
+								maxHealth += 1;
+							}
+							if (CharacterCards.this.getCharacterCards().get(player.getName()).getHealth() < maxHealth) {
+								CharacterCards.this.getCharacterCards().get(player.getName()).setHealth(CharacterCards.this.getCharacterCards().get(player.getName()).getHealth() + 1);
+							}
 						}
 					}
 				}
