@@ -22,6 +22,7 @@ public class SaveDataManager {
 			FileOutputStream fos = new FileOutputStream(plugin.getDataFolder().getAbsolutePath() + File.separator + "character-cards.dat");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(plugin.getCharacterCards());
+			oos.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -37,6 +38,7 @@ public class SaveDataManager {
 				FileInputStream fis = new FileInputStream(plugin.getDataFolder().getAbsolutePath() + File.separator + "character-cards.dat");
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				plugin.getCharacterCards().putAll((Map<String, CharacterCard>) ois.readObject());
+				ois.close();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
