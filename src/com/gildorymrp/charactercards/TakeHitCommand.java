@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -7,9 +7,9 @@ import org.bukkit.command.CommandSender;
 
 public class TakeHitCommand implements CommandExecutor {
 	
-	private CharacterCards plugin;
+	private GildorymCharacterCards plugin;
 	
-	public TakeHitCommand(CharacterCards plugin) {
+	public TakeHitCommand(GildorymCharacterCards plugin) {
 		this.plugin = plugin;
 	}
 

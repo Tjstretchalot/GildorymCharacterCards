@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 public enum Race {
 	

@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

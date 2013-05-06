@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -6,13 +6,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
-import com.gildorym.basicchar.BasicChar;
+import com.gildorymrp.gildorymclasses.GildorymClasses;
 
 public class PlayerInteractEntityListener implements Listener {
 	
-	private CharacterCards plugin;
+	private GildorymCharacterCards plugin;
 	
-	public PlayerInteractEntityListener(CharacterCards plugin) {
+	public PlayerInteractEntityListener(GildorymCharacterCards plugin) {
 		this.plugin = plugin;
 	}
 	
@@ -21,13 +21,13 @@ public class PlayerInteractEntityListener implements Listener {
 		if (event.getPlayer().isSneaking()) {
 			if (event.getRightClicked() instanceof Player) {
 				Player player = (Player) event.getRightClicked();
-				BasicChar basicChar = (BasicChar) plugin.getServer().getPluginManager().getPlugin("BasicChar");
+				GildorymClasses gildorymClasses = (GildorymClasses) plugin.getServer().getPluginManager().getPlugin("GildorymClasses");
 				if (plugin.getCharacterCards().get(player.getName()) == null) {
-					plugin.getCharacterCards().put(player.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, basicChar.levels.get(player.getName())));
+					plugin.getCharacterCards().put(player.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(player.getName())));
 				}
 				event.getPlayer().sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + player.getDisplayName() + ChatColor.BLUE + ChatColor.BOLD + "'s character card");
 				CharacterCard characterCard = plugin.getCharacterCards().get(player.getName());
-				Integer maxHealth = (int) (5 + Math.floor(basicChar.levels.get(player.getName()) / 5));
+				Integer maxHealth = (int) (5 + Math.floor(gildorymClasses.levels.get(player.getName()) / 5));
 				if (characterCard.getRace() == Race.ELF) {
 					maxHealth -= 1;
 				}

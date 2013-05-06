@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -6,9 +6,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class PlayerDeathListener implements Listener {
 	
-	private CharacterCards plugin;
+	private GildorymCharacterCards plugin;
 	
-	public PlayerDeathListener(CharacterCards plugin) {
+	public PlayerDeathListener(GildorymCharacterCards plugin) {
 		this.plugin = plugin;
 	}
 	

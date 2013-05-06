@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -7,25 +7,25 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.gildorym.basicchar.BasicChar;
+import com.gildorymrp.gildorymclasses.GildorymClasses;
 
 public class CharCommand implements CommandExecutor {
 	
-	private CharacterCards plugin;
+	private GildorymCharacterCards plugin;
 
-	public CharCommand(CharacterCards plugin) {
+	public CharCommand(GildorymCharacterCards plugin) {
 		this.plugin = plugin;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		BasicChar basicChar = (BasicChar) Bukkit.getServer().getPluginManager().getPlugin("BasicChar");
+		GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
 		if (plugin.getCharacterCards().get(sender.getName()) == null) {
-			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, basicChar.levels.get(sender.getName())));
+			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
 		}
 		sender.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + ((Player) sender).getDisplayName() + ChatColor.BLUE + ChatColor.BOLD + "'s character card");
 		CharacterCard characterCard = plugin.getCharacterCards().get(sender.getName());
-		Integer maxHealth = (int) (5 + Math.floor(basicChar.levels.get(sender.getName()) / 5));
+		Integer maxHealth = (int) (5 + Math.floor(gildorymClasses.levels.get(sender.getName()) / 5));
 		if (characterCard.getRace() == Race.ELF) {
 			maxHealth -= 1;
 		}

@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -6,21 +6,21 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.gildorym.basicchar.BasicChar;
+import com.gildorymrp.gildorymclasses.GildorymClasses;
 
 public class SetRaceCommand implements CommandExecutor {
 
-	private CharacterCards plugin;
+	private GildorymCharacterCards plugin;
 
-	public SetRaceCommand(CharacterCards plugin) {
+	public SetRaceCommand(GildorymCharacterCards plugin) {
 		this.plugin = plugin;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		BasicChar basicChar = (BasicChar) Bukkit.getServer().getPluginManager().getPlugin("BasicChar");
+		GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
 		if (plugin.getCharacterCards().get(sender.getName()) == null) {
-			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, basicChar.levels.get(sender.getName())));
+			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
 		}
 		if (args.length >= 1) {
 			try {

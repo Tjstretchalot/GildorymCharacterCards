@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.gildorym.basicchar.BasicChar;
+import com.gildorymrp.gildorymclasses.GildorymClasses;
 
-public class CharacterCards extends JavaPlugin {
+public class GildorymCharacterCards extends JavaPlugin {
 	
 	private Map<String, CharacterCard> characterCards = new HashMap<String, CharacterCard>();
 	
@@ -34,21 +34,21 @@ public class CharacterCards extends JavaPlugin {
 			@Override
 			public void run() {
 				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-					BasicChar basicChar = (BasicChar) Bukkit.getServer().getPluginManager().getPlugin("BasicChar");
-					if (basicChar.levels.get(player.getName()) != null) {
-						Integer maxHealth = (int) (5 + Math.floor(basicChar.levels.get(player.getName()) / 5));
-						if (CharacterCards.this.getCharacterCards().get(player.getName()) != null) {
-							if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.ELF) {
+					GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
+					if (gildorymClasses.levels.get(player.getName()) != null) {
+						Integer maxHealth = (int) (5 + Math.floor(gildorymClasses.levels.get(player.getName()) / 5));
+						if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()) != null) {
+							if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.ELF) {
 								maxHealth -= 1;
 							}
-							if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.DWARF) {
+							if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.DWARF) {
 								maxHealth += 1;
 							}
-							if (CharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.GNOME) {
+							if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getRace() == Race.GNOME) {
 								maxHealth += 1;
 							}
-							if (CharacterCards.this.getCharacterCards().get(player.getName()).getHealth() < maxHealth) {
-								CharacterCards.this.getCharacterCards().get(player.getName()).setHealth(CharacterCards.this.getCharacterCards().get(player.getName()).getHealth() + 1);
+							if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getHealth() < maxHealth) {
+								GildorymCharacterCards.this.getCharacterCards().get(player.getName()).setHealth(GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getHealth() + 1);
 							}
 						}
 					}

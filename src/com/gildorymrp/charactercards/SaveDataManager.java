@@ -1,4 +1,4 @@
-package com.gildorym.charactercards;
+package com.gildorymrp.charactercards;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class SaveDataManager {
 	
-	public static void saveData(CharacterCards plugin) {
+	public static void saveData(GildorymCharacterCards plugin) {
 		try {
 			if (!plugin.getDataFolder().exists()) {
 				plugin.getDataFolder().mkdir();
@@ -31,7 +31,7 @@ public class SaveDataManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void loadData(CharacterCards plugin) {
+	public static void loadData(GildorymCharacterCards plugin) {
 		try {
 			File file = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "character-cards.dat");
 			if (file.exists()) {
