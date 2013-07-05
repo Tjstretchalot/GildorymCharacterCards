@@ -1,9 +1,31 @@
+# Eclipse stuff
 /.classpath
 /.project
 /.settings
+
+# netbeans
+/nbproject
+
+# intellij
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# maven
+/build.xml
+/target
+
+# vim
+.*.sw[a-p]
+
+# various other potential build files
 /build
 /bin
 /dist
 /manifest.mf
-.DS_Store
+/MANIFEST.mf
 /export.jardesc
+
+# Mac filesystem dust
+.DS_Store
