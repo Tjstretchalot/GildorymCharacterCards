@@ -5,8 +5,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.gildorymrp.gildorymclasses.GildorymClasses;
+import com.gildorymrp.professions.GildorymProfessions;
 
 public class SetRaceCommand implements CommandExecutor {
 
@@ -19,20 +21,48 @@ public class SetRaceCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
-		if (plugin.getCharacterCards().get(sender.getName()) == null) {
-			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
-		}
-		if (args.length >= 1) {
-			try {
-				plugin.getCharacterCards().get(sender.getName()).setRace(Race.valueOf(args[0].toUpperCase()));
-				sender.sendMessage(ChatColor.GREEN + "Set race to " + Race.valueOf(args[0].toUpperCase()).toString());
-			} catch (IllegalArgumentException exception) {
-				sender.sendMessage(ChatColor.RED + "That race does not exist!");
-				sender.sendMessage(ChatColor.YELLOW + "If the race is a subrace, you may want to choose the main race.");
-				sender.sendMessage(ChatColor.YELLOW + "If the race is a special case, such as an event, you may want to choose OTHER or UNKNOWN.");
+		
+		Player player = null;
+		if (args.length < 1) {
+			sender.sendMessage(ChatColor.RED
+					+ "You need to specify a race!");
+			return true;
+		} else if (args.length == 1) {
+			if (sender instanceof Player) {
+				player = (Player) sender;
+			} else {
+				sender.sendMessage(ChatColor.RED
+						+ "Only a player can perform this command!");
+				return true;
 			}
 		} else {
-			sender.sendMessage(ChatColor.RED + "You need to specify a race!");
+			if (!sender.hasPermission("gildorym.setraceother")) {
+				sender.sendMessage(ChatColor.RED
+						+ "You do not have permission to change another player's race!");
+			}
+			player = sender.getServer().getPlayer(args[1]);
+			if (player == null) {
+				sender.sendMessage(ChatColor.RED
+						+ "That player does not exist!");
+			}
+		}
+		
+		if (plugin.getCharacterCards().get(player.getName()) == null) {
+			plugin.getCharacterCards().put(player.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
+		} else if (plugin.getCharacterCards().get(player.getName()).getRace() != Race.UNKNOWN) {
+			if (!sender.hasPermission("gildorym.setraceother")) {
+				sender.sendMessage(ChatColor.RED
+						+ "You have already set your race!");
+			}
+		}
+		
+		try {
+			plugin.getCharacterCards().get(player.getName()).setRace(Race.valueOf(args[0].toUpperCase()));
+			sender.sendMessage(ChatColor.GREEN + "Set race to " + Race.valueOf(args[0].toUpperCase()).toString());
+		} catch (IllegalArgumentException exception) {
+			sender.sendMessage(ChatColor.RED + "That race does not exist!");
+			sender.sendMessage(ChatColor.YELLOW + "If the race is a subrace, you may want to choose the main race.");
+			sender.sendMessage(ChatColor.YELLOW + "If the race is a special case, such as an event, you may want to choose OTHER or UNKNOWN.");
 		}
 		return true;
 	}

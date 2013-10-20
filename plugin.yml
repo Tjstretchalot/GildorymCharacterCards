@@ -1,5 +1,5 @@
 name: GildorymCharacterCards
-author: Lucariatias
+author: Lucariatias, Hohahihehu
 version: 1.2.10
 main: com.gildorym.charactercards.CharacterCards
 commands:
@@ -11,7 +11,7 @@ commands:
         usage: /<command> [gender]
     setrace:
         description: Sets your race
-        usage: /<command> [race]
+        usage: /<command> [race] (player)
     setinfo:
         description: Sets your description
         usage: /<command> [information]
@@ -24,3 +24,7 @@ commands:
     takehit:
         description: Takes a hit
         usage: /<command>
+permissions:
+    gildorym.setraceother:
+        description: Allows you set another player's race or change your current race
+        default: op
