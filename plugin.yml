@@ -8,7 +8,7 @@ commands:
         usage: /<command> [age]
     setgender:
         description: Sets your gender
-        usage: /<command> [gender]
+        usage: /<command> [gender] (player)
     setrace:
         description: Sets your race
         usage: /<command> [race] (player)
@@ -26,5 +26,8 @@ commands:
         usage: /<command>
 permissions:
     gildorym.setraceother:
-        description: Allows you set another player's race or change your current race
+        description: Allows you to set another player's race or change your current race
+        default: op
+    gildorym.setgenderother:
+        description: Allows you to set another player's gender or change your current gender
         default: op
