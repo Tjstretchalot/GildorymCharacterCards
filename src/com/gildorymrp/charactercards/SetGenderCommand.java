@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.gildorymrp.gildorymclasses.GildorymClasses;
 
@@ -19,6 +20,32 @@ public class SetGenderCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
+		
+		Player player = null;
+                if (args.length < 1) {
+                        sender.sendMessage(ChatColor.RED
+                                        + "You need to specify a gender!");
+                        return true;
+                } else if (args.length == 1) {
+                        if (sender instanceof Player) {
+                                player = (Player) sender;
+                        } else {
+                                sender.sendMessage(ChatColor.RED
+                                                + "Only a player can perform this command!");
+                                return true;
+                        }
+                } else {
+                        if (!sender.hasPermission("gildorym.setgenderother")) {
+                                sender.sendMessage(ChatColor.RED
+                                                + "You do not have permission to change another player's race!");
+                        }
+                        player = sender.getServer().getPlayer(args[1]);
+                        if (player == null) {
+                                sender.sendMessage(ChatColor.RED
+                                                + "That player does not exist!");
+                        }
+                }
+		
 		if (plugin.getCharacterCards().get(sender.getName()) == null) {
 			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
 		}
