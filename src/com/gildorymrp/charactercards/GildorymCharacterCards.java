@@ -31,32 +31,45 @@ public class GildorymCharacterCards extends JavaPlugin {
 				new PlayerDeathListener(this),
 				new EntityRegainHealthListener(),
 		});
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {	
 
 			@Override
 			public void run() {
-				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+				for (String playerName : GildorymCharacterCards.this.getCharacterCards().keySet()) {
 					GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
 
-					if (gildorymClasses.levels.get(player.getName()) != null || gildorymClasses.classes.get(player.getName()) != null) {
-						CharacterClass clazz = gildorymClasses.classes.get(player.getName());
-						Integer level = gildorymClasses.levels.get(player.getName());
+					if (gildorymClasses.levels.get(playerName) != null || gildorymClasses.classes.get(playerName) != null) {
+						CharacterClass clazz = gildorymClasses.classes.get(playerName);
+						Integer level = gildorymClasses.levels.get(playerName);
 
-						if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()) != null) {
-							CharacterCard characterCard = getCharacterCards().get(player.getName());
-							Race race = characterCard.getRace();
-							Integer maxHealth = CharacterCard.calculateHealth(clazz, race, level);
-							if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getHealth() < maxHealth) {
-								GildorymCharacterCards.this.getCharacterCards().get(player.getName()).setHealth(GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getHealth() + 1);
-							} else if (GildorymCharacterCards.this.getCharacterCards().get(player.getName()).getHealth() > maxHealth) {
-								GildorymCharacterCards.this.getCharacterCards().get(player.getName()).setHealth(maxHealth);
+						CharacterCard characterCard = getCharacterCards().get(playerName);
+						Race race = characterCard.getRace();
+						Integer maxHealth = CharacterCard.calculateHealth(clazz, race, level);
+						if (GildorymCharacterCards.this.getCharacterCards().get(playerName).getHealth() < maxHealth) {
+							GildorymCharacterCards.this.getCharacterCards().get(playerName).setHealth(GildorymCharacterCards.this.getCharacterCards().get(playerName).getHealth() + 1);
+							Player player = GildorymCharacterCards.this.getServer().getPlayer(playerName);
+							if (player != null) {
+								player.sendMessage(ChatColor.GREEN + "You feel your strength returning! (+1 RP-PVP Health)");
+							}
+						} else if (GildorymCharacterCards.this.getCharacterCards().get(playerName).getHealth() > maxHealth) {
+							GildorymCharacterCards.this.getCharacterCards().get(playerName).setHealth(maxHealth);
+							Player player = GildorymCharacterCards.this.getServer().getPlayer(playerName);
+							if (player != null) {
+								player.sendMessage(ChatColor.BLUE + "You feel your strength returning to normal. (Temporary HP Removed)");
 							}
 						}
 					}
 				}
+				
+				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+					if (player.hasPermission("gildorym.hitother")) {
+						player.sendMessage(ChatColor.BLUE + "Automatic HP Regen has occured.");
+						player.sendMessage(ChatColor.BLUE + "If currently in an event, you may need to reduce participant HP or restore temporary HP.");
+					}
+				}
 			}
 
-		}, 345600L, 345600L);
+		}, 200L, 345600L);
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
 			@Override
