@@ -20,7 +20,7 @@ public class SetAgeCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		GildorymClasses gildorymClasses = (GildorymClasses) Bukkit.getServer().getPluginManager().getPlugin("GildorymClasses");
 		if (plugin.getCharacterCards().get(sender.getName()) == null) {
-			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
+			plugin.getCharacterCards().put(sender.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName()), gildorymClasses.classes.get(sender.getName())));
 		}
 		if (args.length >= 1) {
 			try {

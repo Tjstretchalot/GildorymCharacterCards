@@ -1,7 +1,7 @@
 name: GildorymCharacterCards
-author: Lucariatias, Hohahihehu
+authors: [Lucariatias, Hohahihehu, melodichand, DreaminCode]
 version: 1.2.10
-main: com.gildorym.charactercards.CharacterCards
+main: com.gildorymrp.charactercards.GildorymCharacterCards
 commands:
     setage:
         description: Sets your age
@@ -24,10 +24,22 @@ commands:
     takehit:
         description: Takes a hit
         usage: /<command>
+    dealhit:
+        description: Deals a hit to a player
+        usage: /<command> [player]
+    healhit:
+        description: Heals a hit on a player
+        usage: /<command> (player)
+    viewhealth:
+        description: Shows another player's health remotely
+        usage: /<command> (player)
 permissions:
     gildorym.setraceother:
         description: Allows you to set another player's race or change your current race
         default: op
     gildorym.setgenderother:
         description: Allows you to set another player's gender or change your current gender
+        default: op
+    gildorym.hitother:
+        description: Allows you to hit/heal another player and view their health remotely
         default: op

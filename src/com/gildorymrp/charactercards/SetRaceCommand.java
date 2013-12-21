@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.gildorymrp.gildorymclasses.GildorymClasses;
-import com.gildorymrp.professions.GildorymProfessions;
 
 public class SetRaceCommand implements CommandExecutor {
 
@@ -48,7 +47,7 @@ public class SetRaceCommand implements CommandExecutor {
 		}
 		
 		if (plugin.getCharacterCards().get(player.getName()) == null) {
-			plugin.getCharacterCards().put(player.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName())));
+			plugin.getCharacterCards().put(player.getName(), new CharacterCard(0, Gender.UNKNOWN, "", Race.UNKNOWN, gildorymClasses.levels.get(sender.getName()), gildorymClasses.classes.get(sender.getName())));
 		} else if (plugin.getCharacterCards().get(player.getName()).getRace() != Race.UNKNOWN) {
 			if (!sender.hasPermission("gildorym.setraceother")) {
 				sender.sendMessage(ChatColor.RED
