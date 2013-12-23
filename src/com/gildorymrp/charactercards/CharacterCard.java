@@ -91,56 +91,62 @@ public class CharacterCard implements Serializable {
 	}
 	
 	public static Integer calculateHealth(CharacterClass clazz, Race race, Integer level) {
-		Integer health;
+		Integer health = 5;
+		int rate;
 		
 		if (level == null) {
 			level = 0;
 		}
 		
 		if (clazz == null) {
-			health = 5;
+			rate = 100;
 		} else {		
 			switch (clazz) 
 			{
 			case BARBARIAN:
-				health = 5 + (level / 3);
+				rate = 3;
 				break;
 
 			case FIGHTER:
 			case PALADIN:
-				health = 5 + (level / 4); 
+				rate = 4;
 				break;
 
 			case MONK:
 			case CLERIC:
 			case DRUID:
 			case RANGER:
-				health = 5 + (level / 5);
+				rate = 5;
 				break;
 
 			case ROGUE:
 			case BARD:
-				health = 5 + (level / 6);
+				rate = 6;
 				break;
 
 			case WIZARD:
 			case SORCERER:
-				health = 5 + (level / 7);
+				rate = 7;
 				break;
 
 			default:
-				health = 5;
+				rate = 100;
 				break;
 			}	
 		}
 
 		if (race == Race.ELF) {
 			health -= 1;
+			rate += 1;
 		} else if (race == Race.DWARF) {
 			health += 1;
+			rate -= 1;
 		} else if (race == Race.GNOME) {
 			health += 1;
+			rate -= 1;
 		}
+		
+		health += (int) Math.floor(level / rate);
 		
 		return health;
 	}
