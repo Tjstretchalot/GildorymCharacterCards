@@ -77,7 +77,7 @@ public class GildorymCharacterCards extends JavaPlugin {
 				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 					if (player.getHealth() < player.getMaxHealth() && player.isSleeping()) {
 						player.setHealth(player.getHealth() + Math.min(Math.round((float) player.getMaxHealth() / 20F), player.getMaxHealth() - player.getHealth()));
-						player.sendMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "You feel a little more refreshed from sleep. +" + Math.min(Math.round((float) player.getMaxHealth() / 20F), player.getMaxHealth() - player.getHealth()) + "HP");
+						player.sendMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "You feel a little more refreshed from sleep. +" + Math.floor(Math.min(Math.round((float) player.getMaxHealth() / 20F), player.getMaxHealth() - player.getHealth())) + "HP");
 					}
 				}
 			}
