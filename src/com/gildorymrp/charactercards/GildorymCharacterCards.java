@@ -14,6 +14,9 @@ import com.gildorymrp.gildorymclasses.GildorymClasses;
 
 public class GildorymCharacterCards extends JavaPlugin {
 
+
+	//TODO: Add alignment. Hook to classes and prevent classes from having illegal alignments.
+	
 	protected static final int level = 0;
 	private Map<String, CharacterCard> characterCards = new HashMap<String, CharacterCard>();
 
