@@ -27,5 +27,8 @@
 /MANIFEST.mf
 /export.jardesc
 
+# jar files, if any dependencies are placed here (like bukkit.jar)
+/*.jar
+
 # Mac filesystem dust
 .DS_Store
