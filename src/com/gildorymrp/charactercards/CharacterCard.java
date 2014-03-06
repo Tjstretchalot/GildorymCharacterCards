@@ -151,4 +151,12 @@ public class CharacterCard implements Serializable {
 		return health;
 	}
 
+	@Override
+	public String toString() {
+		return "CharacterCard [age=" + age + ", gender=" + gender
+				+ ", description=" + description + ", race=" + race
+				+ ", health=" + health + "]";
+	}
+
+	
 }
