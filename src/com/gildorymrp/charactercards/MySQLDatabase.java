@@ -1,16 +1,22 @@
 package com.gildorymrp.charactercards;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.gildorymrp.gildorym.GildorymCharacter;
+import com.gildorymrp.gildorymdb.CreatedCharacterInfo;
+import com.gildorymrp.gildorymdb.GildorymCharacter;
+import com.gildorymrp.gildorymclasses.CharacterBehavior;
+import com.gildorymrp.gildorymclasses.CharacterClass;
+import com.gildorymrp.gildorymclasses.CharacterMorality;
 import com.gildorymrp.gildorymclasses.CharacterProfession;
 
 public class MySQLDatabase {
 
-	private static final String REPLACE_STATEMENT =
+	private static final String REPLACE_CHAR_STATEMENT =
 			"REPLACE INTO characters (" +
 			"uid, " +
 			"char_name, " +
@@ -33,7 +39,7 @@ public class MySQLDatabase {
 			"z, " +
 			"world) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-	private static final String INSERT_STATEMENT =
+	private static final String INSERT_CHAR_STATEMENT =
 			"INSERT INTO characters (" +
 			"char_name, " +
 			"minecraft_account_name, " +
@@ -55,6 +61,33 @@ public class MySQLDatabase {
 			"z, " +
 			"world) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 	
+	private static final String SELECT_CHAR_STATEMENT = 
+			"SELECT * FROM characters WHERE uid=?";
+	
+	private static final String REPLACE_PLAYER_CUR_CHAR = 
+			"REPLACE INTO players (" +
+			"minecraft_account_name," +
+			"current_character_uid) VALUES (?, ?);";
+	private static final String REPLACE_PLAYER_CUR_CHAR_CREATED_CHAR = 
+			"REPLACE INTO players (" +
+			"minecraft_account_name, " +
+			"created_character_id, " +
+			"current_character_uid) VALUES (?, ?, ?);";
+	
+	private static final String SELECT_CUR_CHAR_CREATED = 
+			"SELECT * FROM players WHERE minecraft_account_name=?";
+	
+	private static final String SELECT_CREATED_CHARS =
+			"SELECT * FROM created_characters WHERE id = ?;";
+
+	private static final String INSERT_CREATED_CHAR = 
+			"INSERT INTO created_characters (id, char_uid, created_utc, approved_by) " +
+			"VALUES(?, ?, ?, ?);";
+
+	private static final String CLEAR_CREATED_CHARS = 
+			"DELETE FROM created_characters WHERE id = ?;";
+	
+	
 	private final String HOSTNAME;
 	private final String PORT;
 	private final String DATABASE;
@@ -70,8 +103,6 @@ public class MySQLDatabase {
 		USERNAME = username;
 		PASSWORD = password;
 		this.plugin = plugin;
-		System.out.println(REPLACE_STATEMENT);
-		System.out.println(INSERT_STATEMENT);
 		conn = null;
 	}
 
@@ -123,7 +154,15 @@ public class MySQLDatabase {
 			
 			statement.execute("CREATE TABLE IF NOT EXISTS `players` (" +
 					"`minecraft_account_name` text NOT NULL," +
-					"`character_uid` int(11) DEFAULT NULL" +
+					"`created_characters_id` int(11) DEFAULT NULL," + 
+					"`current_character_uid` int(11) DEFAULT NULL" +
+					");");
+			
+			statement.execute("CREATE TABLE IF NOT EXISTS `created_characters` (" +
+					"`id` int(11) NOT NULL, " +
+					"`char_uid` int(11) NOT NULL DEFAULT -1," +
+					"`created_utc` BIGINT NOT NULL DEFAULT -1, " +
+					"`approved_by` TEXT DEFAULT NULL" +
 					");");
 		}catch(SQLException ex) {
 			ex.printStackTrace();
@@ -145,20 +184,25 @@ public class MySQLDatabase {
 		}
 	}
 	
-	
-	public void saveCharacter(GildorymCharacter gChar) {
+	/**
+	 * Saves the specified gildorym character into the 'characters' table,
+	 * doing an insert if the characters uid
+	 * @param gChar
+	 * @return success
+	 */
+	public boolean saveCharacter(GildorymCharacter gChar) {
 		try {
 			int posMod = 0; // In the event that we are including ID, then we must increase these
 			// numbers by this amount.
 			PreparedStatement statement = null;
 			if(gChar.getUid() != -1) {
-				statement = conn.prepareStatement(REPLACE_STATEMENT);
+				statement = conn.prepareStatement(REPLACE_CHAR_STATEMENT);
 				
 				statement.setInt(1, gChar.getUid());
 				posMod = 1;
 				
 			}else {
-				statement = conn.prepareStatement(INSERT_STATEMENT);
+				statement = conn.prepareStatement(INSERT_CHAR_STATEMENT);
 			}
 			
 			statement.setString(1 + posMod, gChar.getName());
@@ -180,42 +224,228 @@ public class MySQLDatabase {
 			statement.setDouble(17 + posMod, gChar.getY());
 			statement.setDouble(18 + posMod, gChar.getZ());
 			statement.setString(19 + posMod, gChar.getWorld());
-			statement.execute();
+			
+			boolean res = statement.execute();
+			
+			if(gChar.getUid() == -1) {
+				statement = conn.prepareStatement("SELECT LAST_INSERT_ID()");
+				ResultSet results = statement.executeQuery();
+				
+				results.next();
+				int uid = results.getInt(1);
+				results.close();
+				gChar.setUid(uid);
+			}
+			return res;
+			
 		} catch (SQLException e) {
 			plugin.getLogger().log(Level.SEVERE, "Unable to save character " + gChar + "!");
 			e.printStackTrace();
 		}
+		return false;
 	}
-	public ResultSet query(String queryString) {
-		if (!isConnected()) {
-			connect();
-		}
-		
-		Statement queryStatement = null;
-		ResultSet results = null;
-		
+	
+	public GildorymCharacter loadCharacter(int uid) {
+		PreparedStatement statement;
 		try {
-			queryStatement = conn.createStatement();
-			results = queryStatement.executeQuery(queryString);
-		} catch (SQLException ex) {
-			plugin.getLogger().log(Level.SEVERE, "Unable to query database at " + HOSTNAME + ":" + PORT + "/" + DATABASE);
+			statement = conn.prepareStatement(SELECT_CHAR_STATEMENT);
+			statement.setInt(1, uid);
+			
+			ResultSet results = statement.executeQuery();
+			
+			results.next();
+			
+			GildorymCharacter result = new GildorymCharacter(uid);
+			result.setName(results.getString(2));
+			result.setMcName(results.getString(3));
+			result.setCharCard(new CharacterCard(results.getInt(4), 
+					Gender.valueOf(results.getString(5)),
+					results.getString(6),
+					Race.valueOf(results.getString(7)),
+					results.getInt(8), 
+					CharacterClass.valueOf(results.getString(9))));
+			result.setCharClass(CharacterClass.valueOf(results.getString(9)));
+			result.setProfessions(csv(results.getString(10)));
+			result.setLevel(results.getInt(11));
+			result.setExperience(results.getInt(12));
+			result.setStamina(results.getInt(13));
+			result.setMagicalStamina(results.getInt(14));
+			result.setMorality(results.getString(15) != null ? CharacterMorality.valueOf(results.getString(15)) : CharacterMorality.NEUTRAL);
+			result.setBehavior(results.getString(16) != null ? CharacterBehavior.valueOf(results.getString(16)) : CharacterBehavior.NEUTRAL);
+			result.setX(results.getDouble(17));
+			result.setY(results.getDouble(18));
+			result.setZ(results.getDouble(19));
+			result.setWorld(results.getString(20));
+			
+			results.close();
+			
+			
+			return result;
+		} catch (SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to load character with uid " + uid + "!");
+			e.printStackTrace();
 		}
 		
-		return results;
+		return null;
 	}
 	
-
+	public boolean setCurrentCharacter(String playerName, int uid) {
+		try {
+			PreparedStatement statement = conn.prepareStatement(REPLACE_PLAYER_CUR_CHAR);
+			statement.setString(1, playerName);
+			statement.setInt(2, uid);
+			return statement.execute();
+		}catch(SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to set active character of " + playerName + " to " + uid + "!");
+			e.printStackTrace();
+		}
+		return false;
+	}
 	
-	private String csv(CharacterProfession[] professions) {
-		if(professions == null || professions.length == 0 || professions[0] == null)
+	/**
+	 * createdId ought to match with the players first created characters uid, although this 
+	 * is not required
+	 * 
+	 * @param playerName the players minecraft account name
+	 * @param createdId the id associated with characters created by this player
+	 * @param uid the active characters unique identifier
+	 */
+	public boolean setPlayerCharactersCreatedAndActive(String playerName, int createdId, int uid) {
+		try {
+			PreparedStatement statement = conn.prepareStatement(REPLACE_PLAYER_CUR_CHAR_CREATED_CHAR);
+			statement.setString(1, playerName);
+			statement.setInt(2, createdId);
+			statement.setInt(3, uid);
+			return statement.execute();
+		}catch(SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to set active character of " + playerName + " to " + uid + "!");
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns the active character uid and the list of created
+	 * character ids, such that the first (0) position in the array
+	 * is the active and the second (1) position in the array is
+	 * the id to find all of the created characters by this player
+	 * 
+	 * @param playerName
+	 * @return active character uid, created characters id or null
+	 */
+	public int[] getActive(String playerName) {
+		PreparedStatement statement;
+		try {
+			statement = conn.prepareStatement(SELECT_CUR_CHAR_CREATED);
+			statement.setString(1, playerName);
+			
+			ResultSet results = statement.executeQuery();
+			
+			if(!results.next()) {
+				results.close();
+				return null;
+			}
+			
+			int curr = results.getInt("current_character_uid");
+			int cre = results.getInt("created_characters_id");
+			
+			results.close();
+			return new int[]{curr, cre};
+		}catch(SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to get player information about " + playerName);
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns a list of created characters from the specified id (
+	 * which can be retrieved per-player name using getActive(playerName))
+	 * 
+	 * @param createdId the id corresponding with the characters
+	 * @return a list of created characters (potentially empty) or null if an error occurs
+	 */
+	public List<CreatedCharacterInfo> getCreatedCharacterInfo(int createdId) {
+		try {
+			PreparedStatement statement = conn.prepareStatement(SELECT_CREATED_CHARS);
+			
+			statement.setInt(1, createdId);
+			
+			ResultSet resultSet = statement.executeQuery();
+			
+			List<CreatedCharacterInfo> result = new ArrayList<>();
+			
+			while(resultSet.next()) {
+				CreatedCharacterInfo cci = new CreatedCharacterInfo(createdId);
+				cci.setCharUid(resultSet.getInt("char_uid"));
+				cci.setCreatedUTC(resultSet.getLong("created_utc"));
+				cci.setApprovedBy(resultSet.getString("approved_by"));
+				result.add(cci);
+			}
+			
+			resultSet.close();
+			return result;
+		}catch(SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to retrieve created character info for id " + createdId);
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public boolean addCreatedCharacterInfo(CreatedCharacterInfo cci) {
+		try {
+			PreparedStatement statement = conn.prepareStatement(INSERT_CREATED_CHAR);
+			
+			statement.setInt(1, cci.getId());
+			statement.setInt(2, cci.getCharUid());
+			statement.setLong(3, cci.getCreatedUTC());
+			statement.setString(4, cci.getApprovedBy());
+			
+			return statement.execute();
+		}catch(SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to add created character info " + cci);
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean clearCreatedCharacterInfo(int id) {
+		try {
+			PreparedStatement statement = conn.prepareStatement(CLEAR_CREATED_CHARS);
+			
+			statement.setInt(1, id);
+			
+			return statement.execute();
+		}catch(SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to retrieve clear created character info for id " + id);
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private String csv(Enum<?>[] e) {
+		if(e == null || e.length == 0 || e[0] == null)
 			return null;
-		StringBuilder result = new StringBuilder(professions[0].name());
+		StringBuilder result = new StringBuilder(e[0].name());
 		
-		for(int i = 1; i < professions.length; i++) {
-			result.append(",").append(professions[i].name());
+		for(int i = 1; i < e.length; i++) {
+			result.append(",").append(e[i].name());
 		}
 		
 		return result.toString();
+	}
+	
+	private CharacterProfession[] csv(String string) {
+		if(string == null) 
+			return new CharacterProfession[]{};
+		String[] spl = string.split(",");
+		CharacterProfession[] result = new CharacterProfession[spl.length];
+		
+		for(int i = 0; i < spl.length; i++) {
+			result[i] = CharacterProfession.valueOf(spl[i]);
+		}
+		
+		return result;
 	}
 
 }
